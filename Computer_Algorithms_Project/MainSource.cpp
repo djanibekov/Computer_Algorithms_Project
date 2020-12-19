@@ -1,134 +1,19 @@
 #include<iostream>
-#include<string>
-#include<vector>
-using namespace std;
-//
-//class City {
-//    char name;
-//    int placeInMatrix;
-//
-//    char getName() {
-//        return name;
-//    }
-//
-//    void setName(char name) {
-//        this->name = name;
-//    }
-//
-//    int getPlaceInMatrix() {
-//        return placeInMatrix;
-//    }
-//
-//    void setPlaceInMatrix(int placeInMatrix) {
-//        this->placeInMatrix = placeInMatrix;
-//    }
-//};
-//
-//class Good {
-//
-//    int price;
-//    int weight;
-//    City* direction;
-//
-//    Good(int price, int weight, City* direction) {
-//        this->price = price;
-//        this->weight = weight;
-//        this->direction = direction;
-//    }
-//
-//    int getPrice() {
-//        return price;
-//    }
-//
-//    int getWeight() {
-//        return weight;
-//    }
-//
-//    void setPrice(int price) {
-//        this->price = price;
-//    }
-//
-//    void setWeight(int weight) {
-//        this->weight = weight;
-//    }
-//
-//    City* getDirection() {
-//        return direction;
-//    }
-//
-//    void setDirection(City* direction) {
-//        this->direction = direction;
-//    }
-//};
-//
-//class List {
-//
-//    Node* head;
-//    int size;
-//    Node* getHead() {
-//        return head;
-//    }
-//public:
-//    void insertNewNode(Node* newNode) {
-//
-//        Node* node = head;
-//        while (node->getNextNode() != NULL) {
-//            node = node->getNextNode();
-//        }
-//        node = newNode;
-//        size++;
-//    }
-//
-//    //void deleteNode(Good good) {
-//
-//    //    Node* node = head;
-//    //    Node* ptr = node;
-//
-//    //    while (ptr->getGood != good) {
-//    //        node = ptr;
-//    //        ptr = ptr->getNextNode;
-//    //    }
-//
-//    //    node = ptr->getNextNode;
-//    //    delete(ptr);
-//    //    size--;
-//    //}
-//
-//    int getSize() {
-//        return size;
-//    }
-//
-//};
-//
-//class Node {
-//
-//    Node* nextNode;
-//    Good good;
-//
-//public:
-//
-//    Node* getNextNode() {
-//        return nextNode;
-//    }
-//
-//    Good getGood() {
-//        return good;
-//    }
-//
-//};
-//
-int infinity = 1000;
+#include"Good.h"
 
-int cities[10][10] = {0, 150, 300, 200, infinity, infinity,infinity,infinity,infinity,infinity,
-                      140, 0, 100, infinity, 200, infinity, infinity, infinity, infinity, infinity, 
-                      290, 90, 0, 100, infinity, 400, infinity, infinity, infinity, infinity, 
-                      190, infinity, 90, 0, infinity, infinity, 300, infinity, infinity, infinity, 
-                      infinity, 190, infinity, infinity, 0, infinity, infinity, 200, infinity, infinity, 
+using namespace std;
+
+int infinity = 1000;
+int cities[10][10] = { 0, 150, 300, 200, infinity, infinity,infinity,infinity,infinity,infinity,
+                      140, 0, 100, infinity, 200, infinity, infinity, infinity, infinity, infinity,
+                      290, 90, 0, 100, infinity, 400, infinity, infinity, infinity, infinity,
+                      190, infinity, 90, 0, infinity, infinity, 300, infinity, infinity, infinity,
+                      infinity, 190, infinity, infinity, 0, infinity, infinity, 200, infinity, infinity,
                       infinity, infinity, 390, infinity, infinity, 0, infinity, 250, 300, 100,
                       infinity, infinity, infinity, 290, infinity, infinity, 0, infinity, infinity, 200,
-                      infinity, infinity, infinity, infinity, 190, 240, infinity, 0, 100, infinity, 
-                      infinity, infinity, infinity, infinity, infinity, 290, infinity, 90, 0, infinity, 
-                      infinity, infinity, infinity, infinity, infinity, 90, 190, infinity, infinity, 0},
+                      infinity, infinity, infinity, infinity, 190, 240, infinity, 0, 100, infinity,
+                      infinity, infinity, infinity, infinity, infinity, 290, infinity, 90, 0, infinity,
+                      infinity, infinity, infinity, infinity, infinity, 90, 190, infinity, infinity, 0 },
     shortWays[10][10], P[10][10];
 
 
@@ -147,7 +32,7 @@ void calculateShortWays() {
                     shortWays[i][j] = shortWays[k][j] + shortWays[i][k];
                     P[i][j] = k;
                 }
-                
+
             }
         }
     }
@@ -156,19 +41,103 @@ void calculateShortWays() {
 
 
 
-void getOptimalList() {
+void getOptimalList(int max_weight, int numberOfElements, List **list) {
 
+    List* good;
+    int start = 0;
+    int currentLocation = 0;
+    while (max_weight!=0 || start != numberOfElements)
+    {
+        //Coefficient of Knapsack
+        for (int i = start; i < numberOfElements; i++)
+        {
+            good = list[i];
+            good->setGoodCoeff(
+
+            (good->getGoodValue() - shortWays[currentLocation][good->getDirectionX()])/good->getGoodWeight()
+            
+            );
+        }
+        quickSort(list, 0, numberOfElements - 1);
+        max_weight = max_weight - list[start]->getGoodWeight();
+
+        //On the road Goods
+        
+        currentLocation = list[start]->getDirectionY();
+
+        start++;
+
+    }
 
 }
 
+List** quickSort(List** list, int p, int r)
+{
+    if (p < r)
+    {
+        int q = partition(list, p, r);
+        quickSort(list, p, q - 1);
+        quickSort(list, q + 1, r);
+    }
+    return list;
+}
 
-int main() {
-   
+int partition(List** list, int p, int r)
+{
+    float x = list[r]->getGoodCoeff();
+    int i = p - 1;
+    for (int j = p; j <= r - 1; j++)
+    {
+        if (list[j]->getGoodCoeff() >= x)
+        {
+            i = i + 1;
+            std::swap(list[i], list[j]);
+        }
+    }
+    std::swap(list[i + 1], list[r]);
+
+    return i + 1;
+}
+
+void display();
+
+int main() 
+{
+    //display();
+    //return 0;
+
+
+    int numberOfElements, weight, value, x, y;
+    cout << "Number of Goods: ";
+    cin >> numberOfElements;
+
+    List** list = new List * [numberOfElements];
+    Good good;
+    cout << "\n|0. A\t1. B\t2. C\t3. D\t4. E\t5. F\t6. G\t7. H\t8. I\t9. J|\n" << endl;
+    for (int i = 0; i < numberOfElements; i++)
+    {
+        cout << "Weight: ";
+        cin >> weight;
+        cout << "Value: ";
+        cin >> value;
+        cout << "Start: ";
+        cin >> y;
+        cout << "Finish: ";
+        cin >> x;
+        list[i] = good.addToList(weight, value, x, y);
+    }
+    
+
+    return 0;
+}
+
+void display()
+{
     for (int i = 0; i < 10; i++)
     {
         for (int j = 0; j < 10; j++)
         {
-            cout << cities[i][j]<<" ";
+            cout << cities[i][j] << " ";
         }
         cout << endl;
     }
@@ -192,6 +161,4 @@ int main() {
         }
         cout << endl;
     }
-
-    return 0;
 }
