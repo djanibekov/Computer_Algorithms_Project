@@ -21,43 +21,100 @@ int partition(List** list, int p, int r);
 void calculateShortWays();
 void display();
 
-int* getOptimalList(int max_weight, int numberOfElements, List **list) {
-    int* optimalList = new int[numberOfElements];
-    List* good;
-    int start = 0;
-    int currentLocation = 0;
-    while (max_weight!=0 || start != numberOfElements)
+
+void onTheRoadGoods(List* good, int *visitedCities, int* counter)
+{
+    
+    int x = good->getDirectionX(), y = good->getDirectionY(), city;
+
+    city = P[y][x];
+    while (city != 0)
     {
+        visitedCities[*counter] = city;
+        x = city;
+        (*counter)++;
+        city = P[y][x];
+    }
+    visitedCities[*counter] = y;
+
+}
+
+bool semaphore(int city, int* visitedCities, int numberOfElements)
+{
+    for (int i = 0; i < numberOfElements; i++)
+    {
+        if (city == *(visitedCities + i))
+            return true;
+    }
+
+    return false;
+}
+
+int* getOptimalList(int max_weight, int numberOfElements, List **list) {
+    int* optimalList = new int[numberOfElements], *visitedCities;
+    int* visitedCities = new int[numberOfElements];
+    List* good;
+    int currentLocation = 0, lastIndex, *counter = 0;
+    while (max_weight!=0 || numberOfElements != 0)
+    {
+        lastIndex = numberOfElements - 1;
         //Coefficient of Knapsack
-        for (int i = start; i < numberOfElements; i++)
+        for (int i = 0; i < numberOfElements; i++)
         {
             good = list[i];
-            good->setGoodCoeff(
+            if (semaphore(good->getDirectionY(), visitedCities, numberOfElements))
+            {
+                good->setGoodCoeff(
+                    good->getGoodValue() / good->getGoodWeight()
+                );
+            }
+            else
+            {
+                good->setGoodCoeff(
 
-            (good->getGoodValue() - shortWays[currentLocation][good->getDirectionX()])/good->getGoodWeight()
-            
-            );
+                    (good->getGoodValue() - shortWays[currentLocation][good->getDirectionX()]) / good->getGoodWeight()
+
+                );
+            }
         }
-        quickSort(list, 0, numberOfElements - 1);
-        max_weight = max_weight - list[start]->getGoodWeight();
-        optimalList[start] = list[start]->getName();
+        
+        //sorted in ascending order
+        quickSort(list, 0, lastIndex);
+        
+        //since the list is sorted in ascending order the last element would be best
+        //take last element add to optimalList and delete in list of all goods
+        if (max_weight - list[lastIndex]->getGoodWeight()>0)
+        {
+            max_weight = max_weight - list[lastIndex]->getGoodWeight();
+            onTheRoadGoods(list[lastIndex], visitedCities, counter);
+            optimalList[lastIndex] = list[lastIndex]->getName();
+            delete list[lastIndex];
+        }
+        else
+        {
 
+        }
+            
+     
         //On the road Goods
         
-        currentLocation = list[start]->getDirectionX();
-
-        start++;
+        currentLocation = list[numberOfElements]->getDirectionX();
+        numberOfElements--;
 
     }
     return optimalList;
+    //TODO uchest kogda net podhodashih elementov, no max_weight != 0
+    //TODO esli ne podhodit posledniy element to dvinutsa na pred
+    //TODO kogda nado udalat' ne posledniy element nado sdelat' sdvig nalevo, inahche dirka
+
 }
 
 
 
 int main() 
 {
-    //display();
-    //return 0;
+    display();
+    return 0;
 
 
     int numberOfElements, weight, value, x, y;
@@ -136,7 +193,7 @@ int partition(List** list, int p, int r)
     int i = p - 1;
     for (int j = p; j <= r - 1; j++)
     {
-        if (list[j]->getGoodCoeff() >= x)
+        if (list[j]->getGoodCoeff() <= x)
         {
             i = i + 1;
             swap(list[i], list[j]);
