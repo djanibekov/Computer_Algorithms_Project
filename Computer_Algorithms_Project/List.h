@@ -10,11 +10,14 @@ public:
 	void setGoodCoeff(int coeff);
 	int getDirectionX();
 	int getDirectionY();
+	void setName(int name);
+	int getName();
 
 private:
 	int weight, value;
 	float coeff;
 	City direction;
+	int name;
 };
 
 List::List(int weight, int value, int xDirection, int yDirection)
@@ -53,4 +56,14 @@ inline int List::getDirectionX()
 inline int List::getDirectionY()
 {
 	return direction.getYDirection();
+}
+
+inline void List::setName(int name)
+{
+	this->name = name;
+}
+
+inline int List::getName()
+{
+	return name;
 }

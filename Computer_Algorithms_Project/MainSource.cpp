@@ -16,33 +16,13 @@ int cities[10][10] = { 0, 150, 300, 200, infinity, infinity,infinity,infinity,in
                       infinity, infinity, infinity, infinity, infinity, 90, 190, infinity, infinity, 0 },
     shortWays[10][10], P[10][10];
 
+List** quickSort(List** list, int p, int r);
+int partition(List** list, int p, int r);
+void calculateShortWays();
+void display();
 
-void calculateShortWays() {
-
-    for (int i = 0; i < 10; i++) {
-        for (int j = 0; j < 10; j++) {
-            shortWays[i][j] = cities[i][j];
-        }
-    }
-
-    for (int k = 0; k < 10; k++) {
-        for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < 10; j++) {
-                if (shortWays[i][j] > shortWays[k][j] + shortWays[i][k]) {
-                    shortWays[i][j] = shortWays[k][j] + shortWays[i][k];
-                    P[i][j] = k;
-                }
-
-            }
-        }
-    }
-
-}
-
-
-
-void getOptimalList(int max_weight, int numberOfElements, List **list) {
-
+int* getOptimalList(int max_weight, int numberOfElements, List **list) {
+    int* optimalList = new int[numberOfElements];
     List* good;
     int start = 0;
     int currentLocation = 0;
@@ -60,46 +40,19 @@ void getOptimalList(int max_weight, int numberOfElements, List **list) {
         }
         quickSort(list, 0, numberOfElements - 1);
         max_weight = max_weight - list[start]->getGoodWeight();
+        optimalList[start] = list[start]->getName();
 
         //On the road Goods
         
-        currentLocation = list[start]->getDirectionY();
+        currentLocation = list[start]->getDirectionX();
 
         start++;
 
     }
-
+    return optimalList;
 }
 
-List** quickSort(List** list, int p, int r)
-{
-    if (p < r)
-    {
-        int q = partition(list, p, r);
-        quickSort(list, p, q - 1);
-        quickSort(list, q + 1, r);
-    }
-    return list;
-}
 
-int partition(List** list, int p, int r)
-{
-    float x = list[r]->getGoodCoeff();
-    int i = p - 1;
-    for (int j = p; j <= r - 1; j++)
-    {
-        if (list[j]->getGoodCoeff() >= x)
-        {
-            i = i + 1;
-            std::swap(list[i], list[j]);
-        }
-    }
-    std::swap(list[i + 1], list[r]);
-
-    return i + 1;
-}
-
-void display();
 
 int main() 
 {
@@ -108,6 +61,7 @@ int main()
 
 
     int numberOfElements, weight, value, x, y;
+    int name = 0;
     cout << "Number of Goods: ";
     cin >> numberOfElements;
 
@@ -125,6 +79,9 @@ int main()
         cout << "Finish: ";
         cin >> x;
         list[i] = good.addToList(weight, value, x, y);
+        
+        list[i]->setName(name);
+        name++;
     }
     
 
@@ -161,4 +118,53 @@ void display()
         }
         cout << endl;
     }
+}
+List** quickSort(List** list, int p, int r)
+{
+    if (p < r)
+    {
+        int q = partition(list, p, r);
+        quickSort(list, p, q - 1);
+        quickSort(list, q + 1, r);
+    }
+    return list;
+}
+
+int partition(List** list, int p, int r)
+{
+    float x = list[r]->getGoodCoeff();
+    int i = p - 1;
+    for (int j = p; j <= r - 1; j++)
+    {
+        if (list[j]->getGoodCoeff() >= x)
+        {
+            i = i + 1;
+            swap(list[i], list[j]);
+        }
+    }
+    swap(list[i + 1], list[r]);
+
+    return i + 1;
+}
+
+void calculateShortWays() {
+
+    for (int i = 0; i < 10; i++) {
+        for (int j = 0; j < 10; j++) {
+            shortWays[i][j] = cities[i][j];
+        }
+    }
+
+    for (int k = 0; k < 10; k++) {
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                if (shortWays[i][j] > shortWays[k][j] + shortWays[i][k]) {
+                    shortWays[i][j] = shortWays[k][j] + shortWays[i][k];
+                    P[i][j] = k;
+                }
+
+            }
+        }
+    }
+
 }
