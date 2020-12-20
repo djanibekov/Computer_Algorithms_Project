@@ -35,7 +35,7 @@ inline int List::getGoodWeight()
 
 inline int List::getGoodValue()
 {
-	return weight;
+	return value;
 }
 
 inline float List::getGoodCoeff()

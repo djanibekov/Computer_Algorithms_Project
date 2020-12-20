@@ -24,9 +24,10 @@ void display();
 
 void onTheRoadGoods(List* good, int *visitedCities, int* counter)
 {
-    
+    cout << endl;
+    cout <<"counter: "<< *counter << endl;
     int x = good->getDirectionX(), y = good->getDirectionY(), city;
-
+    cout << "here\n";
     city = P[y][x];
     while (city != 0)
     {
@@ -44,17 +45,33 @@ bool semaphore(int city, int* visitedCities, int numberOfElements)
     for (int i = 0; i < numberOfElements; i++)
     {
         if (city == *(visitedCities + i))
+        {
             return true;
+        }
+            
     }
-
     return false;
 }
 
+int chooseGood(int max_weight, List **list, int lastIndex){
+	for (int i = lastIndex; i >= 0; i--)
+		if (max_weight - list[i]->getGoodWeight() > 0)
+			return i;
+		else
+			return -1;
+}
+
+void shift(List **list, int lastIndex, int deletedIndex){
+	for (int i = deletedIndex; i < lastIndex ; i++){
+		list[i] = list[i + 1];
+	}
+}
+
 int* getOptimalList(int max_weight, int numberOfElements, List **list) {
-    int* optimalList = new int[numberOfElements], *visitedCities;
+    int* optimalList = new int[numberOfElements];
     int* visitedCities = new int[numberOfElements];
     List* good;
-    int currentLocation = 0, lastIndex, *counter = 0;
+    int currentLocation = 0, lastIndex, counter = 0, optimalCounter = 0;
     while (max_weight!=0 || numberOfElements != 0)
     {
         lastIndex = numberOfElements - 1;
@@ -62,11 +79,14 @@ int* getOptimalList(int max_weight, int numberOfElements, List **list) {
         for (int i = 0; i < numberOfElements; i++)
         {
             good = list[i];
+
+
             if (semaphore(good->getDirectionY(), visitedCities, numberOfElements))
             {
                 good->setGoodCoeff(
                     good->getGoodValue() / good->getGoodWeight()
                 );
+               
             }
             else
             {
@@ -76,36 +96,44 @@ int* getOptimalList(int max_weight, int numberOfElements, List **list) {
 
                 );
             }
+            //cout << good->getGoodCoeff() << endl;
         }
         
         //sorted in ascending order
-        quickSort(list, 0, lastIndex);
         
+
+        list = quickSort(list, 0, lastIndex);//TODO makeGoodPivot function
+
+
+        //for (int i = 0; i < numberOfElements; i++)
+        //{
+        //    cout << list[i]->getName() << " ";
+        //}
+        //cout << endl;
+
         //since the list is sorted in ascending order the last element would be best
         //take last element add to optimalList and delete in list of all goods
-        if (max_weight - list[lastIndex]->getGoodWeight()>0)
+		int index = chooseGood(max_weight, list, lastIndex); // choose best good that ok with weight
+		if (index >= 0)
         {
-            max_weight = max_weight - list[lastIndex]->getGoodWeight();
-            onTheRoadGoods(list[lastIndex], visitedCities, counter);
-            optimalList[lastIndex] = list[lastIndex]->getName();
-            delete list[lastIndex];
+			max_weight = max_weight - list[index]->getGoodWeight();
+			onTheRoadGoods(list[index], visitedCities, &counter);
+			optimalList[optimalCounter] = list[index]->getName();
+            currentLocation = list[index]->getDirectionX();
+			delete list[index];
+			shift(list, lastIndex, index);
+            cout << "optimalList: " << optimalList[optimalCounter] << endl;;
+            optimalCounter++;
         }
-        else
+        else //if index negative, so there is no left good that is ok with weight. Break and go out from loop
         {
-
-        }
-            
-     
-        //On the road Goods
+			break;
+        }        
         
-        currentLocation = list[numberOfElements]->getDirectionX();
         numberOfElements--;
 
     }
     return optimalList;
-    //TODO uchest kogda net podhodashih elementov, no max_weight != 0
-    //TODO esli ne podhodit posledniy element to dvinutsa na pred
-    //TODO kogda nado udalat' ne posledniy element nado sdelat' sdvig nalevo, inahche dirka
 
 }
 
@@ -113,35 +141,52 @@ int* getOptimalList(int max_weight, int numberOfElements, List **list) {
 
 int main() 
 {
-    display();
-    return 0;
+    //display();
+    //return 0;
 
 
     int numberOfElements, weight, value, x, y;
-    int name = 0;
+    int name = 0, max_weight;
     cout << "Number of Goods: ";
     cin >> numberOfElements;
 
+    cout << "Knapsack capasity: ";
+    cin >> max_weight;
+
     List** list = new List * [numberOfElements];
+    int* optimalList = new int[numberOfElements];
     Good good;
     cout << "\n|0. A\t1. B\t2. C\t3. D\t4. E\t5. F\t6. G\t7. H\t8. I\t9. J|\n" << endl;
     for (int i = 0; i < numberOfElements; i++)
     {
-        cout << "Weight: ";
+        //cout << "Weight: ";
         cin >> weight;
-        cout << "Value: ";
+        //cout << "Value: ";
         cin >> value;
-        cout << "Start: ";
-        cin >> y;
-        cout << "Finish: ";
+       // cout << "To: ";
         cin >> x;
+        y = 0;
+        cout << endl;
         list[i] = good.addToList(weight, value, x, y);
         
         list[i]->setName(name);
         name++;
     }
-    
+    calculateShortWays();
 
+    optimalList = getOptimalList(max_weight, numberOfElements, list);
+    int i = 0;
+    while (true)
+    {
+        try
+        {
+            cout << optimalList[i] << " ";
+        }
+        catch (const std::exception&)
+        {
+            break;
+        }
+    }
     return 0;
 }
 
