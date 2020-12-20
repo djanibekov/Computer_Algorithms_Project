@@ -50,6 +50,20 @@ bool semaphore(int city, int* visitedCities, int numberOfElements)
     return false;
 }
 
+int chooseGood(int max_weight, List **list, int lastIndex){
+	for (int i = lastIndex; i >= 0; i++)
+		if (max_weight - list[i]->getGoodWeight() > 0)
+			return i;
+		else
+			return -1;
+}
+
+void shift(List **list, int lastIndex, int deletedIndex){
+	for (int i = lastIndex; i < deletedIndex; i++){
+		list[i] = list[i + 1];
+	}
+}
+
 int* getOptimalList(int max_weight, int numberOfElements, List **list) {
     int* optimalList = new int[numberOfElements], *visitedCities;
     int* visitedCities = new int[numberOfElements];
@@ -83,16 +97,19 @@ int* getOptimalList(int max_weight, int numberOfElements, List **list) {
         
         //since the list is sorted in ascending order the last element would be best
         //take last element add to optimalList and delete in list of all goods
-        if (max_weight - list[lastIndex]->getGoodWeight()>0)
+		int index = chooseGood(max_weight, list, lastIndex); // choose best good that ok with weight
+		if (index >= 0)
         {
-            max_weight = max_weight - list[lastIndex]->getGoodWeight();
-            onTheRoadGoods(list[lastIndex], visitedCities, counter);
-            optimalList[lastIndex] = list[lastIndex]->getName();
-            delete list[lastIndex];
+			max_weight = max_weight - list[index]->getGoodWeight();
+			onTheRoadGoods(list[index], visitedCities, counter);
+			optimalList[index] = list[index]->getName();//??????????????????????????????????????????????????????????????????????????????????????????????????????????
+			delete list[index];
+			shift(list, lastIndex, index);
+			//TODO obsudit` s Amirom izmeneniya ( funkcii chooseGood(..) i shift(..)
         }
-        else
+        else //if index negative, so there is no left good that is ok with weight. Break and go out from loop
         {
-
+			break;
         }
             
      
@@ -103,9 +120,6 @@ int* getOptimalList(int max_weight, int numberOfElements, List **list) {
 
     }
     return optimalList;
-    //TODO uchest kogda net podhodashih elementov, no max_weight != 0
-    //TODO esli ne podhodit posledniy element to dvinutsa na pred
-    //TODO kogda nado udalat' ne posledniy element nado sdelat' sdvig nalevo, inahche dirka
 
 }
 
