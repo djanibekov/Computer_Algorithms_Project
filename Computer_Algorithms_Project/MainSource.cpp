@@ -24,10 +24,7 @@ void display();
 
 void onTheRoadGoods(List* good, int *visitedCities, int* counter)
 {
-    cout << endl;
-    cout <<"counter: "<< *counter << endl;
     int x = good->getDirectionX(), y = good->getDirectionY(), city;
-    cout << "here\n";
     city = P[y][x];
     while (city != 0)
     {
@@ -37,14 +34,17 @@ void onTheRoadGoods(List* good, int *visitedCities, int* counter)
         city = P[y][x];
     }
     visitedCities[*counter] = y;
-
+    for (int i = 0; i < *counter; i++)
+    {
+        cout << visitedCities[i] << endl;
+    }
 }
 
-bool semaphore(int city, int* visitedCities, int numberOfElements)
+bool semaphore(int city, int* visitedCities, int* numberOfElements)
 {
-    for (int i = 0; i < numberOfElements; i++)
+    for (int i = 0; i < *numberOfElements; i++)
     {
-        if (city == *(visitedCities + i))
+        if (city == visitedCities[i])
         {
             return true;
         }
@@ -55,7 +55,7 @@ bool semaphore(int city, int* visitedCities, int numberOfElements)
 
 int chooseGood(int max_weight, List **list, int lastIndex){
 	for (int i = lastIndex; i >= 0; i--)
-		if (max_weight - list[i]->getGoodWeight() > 0)
+		if (max_weight - list[i]->getGoodWeight() >= 0)
 			return i;
 		else
 			return -1;
@@ -81,7 +81,7 @@ int* getOptimalList(int max_weight, int numberOfElements, List **list) {
             good = list[i];
 
 
-            if (semaphore(good->getDirectionY(), visitedCities, numberOfElements))
+            if (semaphore(good->getDirectionX(), visitedCities, &counter))
             {
                 good->setGoodCoeff(
                     good->getGoodValue() / good->getGoodWeight()
@@ -96,7 +96,7 @@ int* getOptimalList(int max_weight, int numberOfElements, List **list) {
 
                 );
             }
-            //cout << good->getGoodCoeff() << endl;
+            cout << good->getGoodCoeff() << endl;
         }
         
         //sorted in ascending order
@@ -117,14 +117,20 @@ int* getOptimalList(int max_weight, int numberOfElements, List **list) {
 		if (index >= 0)
         {
 			max_weight = max_weight - list[index]->getGoodWeight();
-			onTheRoadGoods(list[index], visitedCities, &counter);
+			
 			optimalList[optimalCounter] = list[index]->getName();
-            currentLocation = list[index]->getDirectionX();
+
+            if (!semaphore(list[index]->getDirectionX(), visitedCities, &counter))
+            {
+                onTheRoadGoods(list[index], visitedCities, &counter);
+                currentLocation = list[index]->getDirectionX();
+            } 
 			delete list[index];
+
 			shift(list, lastIndex, index);
             cout << "optimalList: " << optimalList[optimalCounter] << endl;;
             optimalCounter++;
-        }
+            }
         else //if index negative, so there is no left good that is ok with weight. Break and go out from loop
         {
 			break;
@@ -133,6 +139,7 @@ int* getOptimalList(int max_weight, int numberOfElements, List **list) {
         numberOfElements--;
 
     }
+    optimalList[optimalCounter] = -1;
     return optimalList;
 
 }
@@ -159,11 +166,11 @@ int main()
     cout << "\n|0. A\t1. B\t2. C\t3. D\t4. E\t5. F\t6. G\t7. H\t8. I\t9. J|\n" << endl;
     for (int i = 0; i < numberOfElements; i++)
     {
-        //cout << "Weight: ";
+        cout << "Weight: ";
         cin >> weight;
-        //cout << "Value: ";
+        cout << "Value: ";
         cin >> value;
-       // cout << "To: ";
+        cout << "To: ";
         cin >> x;
         y = 0;
         cout << endl;
@@ -176,16 +183,12 @@ int main()
 
     optimalList = getOptimalList(max_weight, numberOfElements, list);
     int i = 0;
-    while (true)
+    cout << "List: " << endl;
+    while (optimalList[i]!=-1)
     {
-        try
-        {
-            cout << optimalList[i] << " ";
-        }
-        catch (const std::exception&)
-        {
-            break;
-        }
+        cout << optimalList[i] << " ";
+        i++;
+
     }
     return 0;
 }
