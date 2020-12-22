@@ -1,4 +1,4 @@
-#include<iostream>
+﻿#include<iostream>
 #include"Good.h"
 
 using namespace std;
@@ -14,155 +14,36 @@ int cities[10][10] = { 0, 150, 300, 200, infinity, infinity,infinity,infinity,in
                       infinity, infinity, infinity, infinity, 190, 240, infinity, 0, 100, infinity,
                       infinity, infinity, infinity, infinity, infinity, 290, infinity, 90, 0, infinity,
                       infinity, infinity, infinity, infinity, infinity, 90, 190, infinity, infinity, 0 },
+    //predefined graph
     shortWays[10][10], P[10][10];
 
 List** quickSort(List** list, int p, int r);
 int partition(List** list, int p, int r);
 void calculateShortWays();
+void onTheRoadGoods(List* good, int* visitedCities, int* counter);
+bool isVisited(int city, int* visitedCities, int* numberOfElements);
+int chooseGood(int max_weight, List** list, int lastIndex);
+void shift(List** list, int lastIndex, int deletedIndex);
+int* getOptimalList(int max_weight, int numberOfElements, List** list, int* optimalList);
 void display();
-
-
-void onTheRoadGoods(List* good, int *visitedCities, int* counter)
-{
-    int x = good->getDirectionX(), y = good->getDirectionY(), city;
-    city = P[y][x];
-    while (city != 0)
-    {
-        visitedCities[*counter] = city;
-        x = city;
-        (*counter)++;
-        city = P[y][x];
-    }
-    visitedCities[*counter] = y;
-    for (int i = 0; i < *counter; i++)
-    {
-        cout << visitedCities[i] << endl;
-    }
-}
-
-bool semaphore(int city, int* visitedCities, int* numberOfElements)
-{
-    for (int i = 0; i < *numberOfElements; i++)
-    {
-        if (city == visitedCities[i])
-        {
-            return true;
-        }
-            
-    }
-    return false;
-}
-
-int chooseGood(int max_weight, List **list, int lastIndex){
-	for (int i = lastIndex; i >= 0; i--)
-		if (max_weight - list[i]->getGoodWeight() >= 0)
-			return i;
-		else
-			return -1;
-}
-
-void shift(List **list, int lastIndex, int deletedIndex){
-	for (int i = deletedIndex; i < lastIndex ; i++){
-		list[i] = list[i + 1];
-	}
-}
-
-int* getOptimalList(int max_weight, int numberOfElements, List **list) {
-    int* optimalList = new int[numberOfElements];
-    int* visitedCities = new int[numberOfElements];
-    List* good;
-    int currentLocation = 0, lastIndex, counter = 0, optimalCounter = 0;
-    while (max_weight!=0 || numberOfElements != 0)
-    {
-        lastIndex = numberOfElements - 1;
-        //Coefficient of Knapsack
-        for (int i = 0; i < numberOfElements; i++)
-        {
-            good = list[i];
-
-
-            if (semaphore(good->getDirectionX(), visitedCities, &counter))
-            {
-                good->setGoodCoeff(
-                    good->getGoodValue() / good->getGoodWeight()
-                );
-               
-            }
-            else
-            {
-                good->setGoodCoeff(
-
-                    (good->getGoodValue() - shortWays[currentLocation][good->getDirectionX()]) / good->getGoodWeight()
-
-                );
-            }
-            cout << good->getGoodCoeff() << endl;
-        }
-        
-        //sorted in ascending order
-        
-
-        list = quickSort(list, 0, lastIndex);//TODO makeGoodPivot function
-
-
-        //for (int i = 0; i < numberOfElements; i++)
-        //{
-        //    cout << list[i]->getName() << " ";
-        //}
-        //cout << endl;
-
-        //since the list is sorted in ascending order the last element would be best
-        //take last element add to optimalList and delete in list of all goods
-		int index = chooseGood(max_weight, list, lastIndex); // choose best good that ok with weight
-		if (index >= 0)
-        {
-			max_weight = max_weight - list[index]->getGoodWeight();
-			
-			optimalList[optimalCounter] = list[index]->getName();
-
-            if (!semaphore(list[index]->getDirectionX(), visitedCities, &counter))
-            {
-                onTheRoadGoods(list[index], visitedCities, &counter);
-                currentLocation = list[index]->getDirectionX();
-            } 
-			delete list[index];
-
-			shift(list, lastIndex, index);
-            cout << "optimalList: " << optimalList[optimalCounter] << endl;;
-            optimalCounter++;
-            }
-        else //if index negative, so there is no left good that is ok with weight. Break and go out from loop
-        {
-			break;
-        }        
-        
-        numberOfElements--;
-
-    }
-    optimalList[optimalCounter] = -1;
-    return optimalList;
-
-}
-
-
 
 int main() 
 {
-    //display();
-    //return 0;
-
-
     int numberOfElements, weight, value, x, y;
-    int name = 0, max_weight;
+    int id = 0, max_weight;
+
+    calculateShortWays();//predefined graph
+
     cout << "Number of Goods: ";
     cin >> numberOfElements;
 
     cout << "Knapsack capasity: ";
     cin >> max_weight;
 
-    List** list = new List * [numberOfElements];
-    int* optimalList = new int[numberOfElements];
     Good good;
+    List** list = new List * [numberOfElements]; // double pointer list to keep "good/product" pointers
+    int* optimalList = new int[numberOfElements]; //final list that need to be deliver to get max profit
+    
     cout << "\n|0. A\t1. B\t2. C\t3. D\t4. E\t5. F\t6. G\t7. H\t8. I\t9. J|\n" << endl;
     for (int i = 0; i < numberOfElements; i++)
     {
@@ -174,27 +55,48 @@ int main()
         cin >> x;
         y = 0;
         cout << endl;
-        list[i] = good.addToList(weight, value, x, y);
-        
-        list[i]->setName(name);
-        name++;
-    }
-    calculateShortWays();
+        list[i] = good.addToList(id, weight, value, x, y);
 
-    optimalList = getOptimalList(max_weight, numberOfElements, list);
+        id++;
+    }
+
+    optimalList = getOptimalList(max_weight, numberOfElements, list, optimalList);
+
     int i = 0;
     cout << "List: " << endl;
     while (optimalList[i]!=-1)
     {
-        cout << optimalList[i] << " ";
+        cout << optimalList[i] << " ";//prints the id of good
         i++;
-
     }
     return 0;
 }
 
-void display()
+void calculateShortWays() {
+    //Floyd Warshall algorithm
+    for (int i = 0; i < 10; i++) {
+        for (int j = 0; j < 10; j++) {
+            shortWays[i][j] = cities[i][j];
+        }
+    }
+
+    for (int k = 0; k < 10; k++) {
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                if (shortWays[i][j] > shortWays[k][j] + shortWays[i][k]) {
+                    shortWays[i][j] = shortWays[k][j] + shortWays[i][k];
+                    P[i][j] = k;
+                }
+
+            }
+        }
+    }
+
+}
+
+void display() //Debug purpose functoin
 {
+    //displays cities that predefined
     for (int i = 0; i < 10; i++)
     {
         for (int j = 0; j < 10; j++)
@@ -204,8 +106,8 @@ void display()
         cout << endl;
     }
     cout << endl;
-    calculateShortWays();
 
+    //displays short ways from 0 to any city
     for (int i = 0; i < 10; i++)
     {
         for (int j = 0; j < 10; j++)
@@ -215,6 +117,8 @@ void display()
         cout << endl;
     }
     cout << endl;
+
+    //displays relations of cities
     for (int i = 0; i < 10; i++)
     {
         for (int j = 0; j < 10; j++)
@@ -224,6 +128,7 @@ void display()
         cout << endl;
     }
 }
+
 List** quickSort(List** list, int p, int r)
 {
     if (p < r)
@@ -252,24 +157,110 @@ int partition(List** list, int p, int r)
     return i + 1;
 }
 
-void calculateShortWays() {
 
-    for (int i = 0; i < 10; i++) {
-        for (int j = 0; j < 10; j++) {
-            shortWays[i][j] = cities[i][j];
-        }
+void onTheRoadGoods(List* good, int* visitedCities, int* counter)
+{
+    int x = good->getDirectionX(), y = good->getDirectionY(), city;
+    city = P[y][x];
+    while (city != 0)
+    {
+        visitedCities[*counter] = city;
+        x = city;
+        (*counter)++;
+        city = P[y][x];
     }
+    visitedCities[*counter] = y;
 
-    for (int k = 0; k < 10; k++) {
-        for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < 10; j++) {
-                if (shortWays[i][j] > shortWays[k][j] + shortWays[i][k]) {
-                    shortWays[i][j] = shortWays[k][j] + shortWays[i][k];
-                    P[i][j] = k;
-                }
+    for (int i = 0; i < *counter; i++)
+        cout << visitedCities[i] << endl;
+}
 
+bool isVisited(int city, int* visitedCities, int* numberOfElements)
+{
+    for (int i = 0; i < *numberOfElements; i++)
+    {
+        if (city == visitedCities[i])
+            return true;
+
+    }
+    return false;
+}
+
+int chooseGood(int max_weight, List** list, int lastIndex) {
+    for (int i = lastIndex; i >= 0; i--)
+        if (max_weight - list[i]->getGoodWeight() >= 0)
+            return i;
+        else
+            return -1;
+}
+
+void shift(List** list, int lastIndex, int deletedIndex) {
+    for (int i = deletedIndex; i < lastIndex; i++) {
+        list[i] = list[i + 1];
+    }
+}
+
+int* getOptimalList(int max_weight, int numberOfElements, List** list, int* optimalList) {
+    List* good;
+    int* visitedCities = new int[numberOfElements];
+    int currentLocation = 0, lastIndex, counter = 0, optimalCounter = 0;
+    while (max_weight != 0 || numberOfElements != 0)
+    {
+        lastIndex = numberOfElements - 1;
+        //calculation of coefficients of the Knapsack
+        for (int i = 0; i < numberOfElements; i++)
+        {
+            good = list[i];
+
+            if (isVisited(good->getDirectionX(), visitedCities, &counter))
+            {
+                good->setGoodCoeff(
+                    good->getGoodValue() / good->getGoodWeight()
+                );
             }
+            else
+            {
+                good->setGoodCoeff(
+                    (good->getGoodValue() - shortWays[currentLocation][good->getDirectionX()]) / good->getGoodWeight()
+                );
+            }
+            cout << good->getGoodCoeff() << endl; //наверно оставим чтоб показать как вычисляет коеффиценты
         }
+
+        //sorted list in ascending order
+        list = quickSort(list, 0, lastIndex);//TODO makeGoodPivot function
+
+        //since the list is sorted in ascending order the last element would be best
+        //take last element add to optimalList and delete in list of all goods
+        int index = chooseGood(max_weight, list, lastIndex); // choose best good that OK with weight
+        if (index >= 0)
+        {
+            max_weight = max_weight - list[index]->getGoodWeight();
+
+            optimalList[optimalCounter] = list[index]->getId();
+
+            if (!isVisited(list[index]->getDirectionX(), visitedCities, &counter))
+                //guard that checks whether path A to B had median C(or more)
+            {
+                onTheRoadGoods(list[index], visitedCities, &counter);//
+                currentLocation = list[index]->getDirectionX(); //TODO discuss again
+            }
+            delete list[index];//deletion of good object in list, forms an empty space
+
+            shift(list, lastIndex, index); //deals with empty space that left after delition
+            //simply moves object that after "hole" by index - 1
+
+            optimalCounter++;
+        }
+        else //there is no left good that is OK with weight. Break and go out from loop
+        {
+            break;
+        }
+
+        numberOfElements--;
+
     }
+    optimalList[optimalCounter] = -1;
+    return optimalList;
 
 }
