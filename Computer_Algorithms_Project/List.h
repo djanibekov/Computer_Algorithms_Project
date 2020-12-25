@@ -2,7 +2,7 @@
 class List
 {
 public:
-	List(int weight, int value, int xDirection, int yDirection);
+	List(int id, int weight, int value, int xDirection, int yDirection);
 	~List() {}
 	int getGoodWeight();
 	int getGoodValue();
@@ -10,18 +10,17 @@ public:
 	void setGoodCoeff(int coeff);
 	int getDirectionX();
 	int getDirectionY();
-	void setName(int name);
-	int getName();
+	int getId();
 
 private:
-	int weight, value;
+	int id, weight, value;
 	float coeff;
 	City direction;
-	int name;
 };
 
-List::List(int weight, int value, int xDirection, int yDirection)
+List::List(int id, int weight, int value, int xDirection, int yDirection)
 {
+	this->id = id;
 	this->weight = weight;
 	this->value = value;
 	this->direction = City(xDirection, yDirection);
@@ -58,12 +57,7 @@ inline int List::getDirectionY()
 	return direction.getYDirection();
 }
 
-inline void List::setName(int name)
+inline int List::getId()
 {
-	this->name = name;
-}
-
-inline int List::getName()
-{
-	return name;
+	return id;
 }

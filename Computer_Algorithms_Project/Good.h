@@ -1,11 +1,11 @@
 #include"List.h"
 
-class Good
+class Good //Factory, generates objects
 {
 public:
-	List* addToList(int weight, int value, int xDirection, int yDirection)
+	List* addToList(int id, int weight, int value, int xDirection, int yDirection)
 	{
-		return new List(weight, value, xDirection, yDirection);
+		return new List(id, weight, value, xDirection, yDirection);
 	}
 
 };
