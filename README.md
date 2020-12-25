@@ -1,3 +1,25 @@
 # Computer_Algorithms_Project
-Joni luchshe vseh soset)))
-![blowjob](https://picshd.biguz.net/7036356e43e6a9beb03f86168038a588_5/Beautiful+Brunette+Leah+Gotti+Giving+a+Blowjob.jpg)
+```bash
+number of element: 5
+knapsack size: 12
+
+weight: 5
+value: 15000
+destination: 8
+
+weight: 3
+value: 1
+destination: 4
+
+weight: 3
+value: 1000
+destination: 2
+
+weight: 3
+value: 900
+destination: 1
+
+weight: 3
+value: 600
+destination: 5
+```
