@@ -1,4 +1,5 @@
 ﻿#include<iostream>
+#include<math.h>
 #include"Good.h"
 
 using namespace std;
@@ -19,6 +20,7 @@ int cities[10][10] = { 0, 150, 300, 200, infinity, infinity,infinity,infinity,in
 
 List** quickSort(List** list, int p, int r);
 int partition(List** list, int p, int r);
+void choseBestPivot(List** list, int size);
 void calculateShortWays();
 void onTheRoadGoods(List* good, int* visitedCities, int* counter);
 bool isVisited(int city, int* visitedCities, int* numberOfElements);
@@ -45,13 +47,15 @@ int main()
     int* optimalList = new int[numberOfElements]; //final list that need to be deliver to get max profit
     
     cout << "\n|0. A\t1. B\t2. C\t3. D\t4. E\t5. F\t6. G\t7. H\t8. I\t9. J|\n" << endl;
+    cout << "Please enter good`s information (Weight, Value, Destination): " << endl;
     for (int i = 0; i < numberOfElements; i++)
     {
+        cout << "Good #" << i + 1 << endl;
         cout << "Weight: ";
         cin >> weight;
         cout << "Value: ";
         cin >> value;
-        cout << "To: ";
+        cout << "Destination: ";
         cin >> x;
         y = 0;
         cout << endl;
@@ -63,10 +67,10 @@ int main()
     optimalList = getOptimalList(max_weight, numberOfElements, list, optimalList);
 
     int i = 0;
-    cout << "List: " << endl;
+    cout << "Result list: " << endl;
     while (optimalList[i]!=-1)
     {
-        cout << optimalList[i] << " ";//prints the id of good
+        cout << optimalList[i] + 1 << " ";//prints the id of good
         i++;
     }
     return 0;
@@ -157,6 +161,25 @@ int partition(List** list, int p, int r)
     return i + 1;
 }
 
+void choseBestPivot(List** list, int size)
+{
+    int sum = 0, median, best_median, diff = 0;
+    for (int i = 0; i < size; i++)
+    {
+        sum = sum + list[i]->getGoodCoeff();
+    }
+    median = sum / size;
+    best_median = 0;
+    for (int i = 0; i < size; i++)
+    {
+        if (abs(median - list[best_median]->getGoodCoeff()) > abs(median - list[i]->getGoodCoeff()))
+        {
+            best_median = i;
+        }
+    }
+    swap(list[0], list[best_median]);
+}
+
 
 void onTheRoadGoods(List* good, int* visitedCities, int* counter)
 {
@@ -171,8 +194,8 @@ void onTheRoadGoods(List* good, int* visitedCities, int* counter)
     }
     visitedCities[*counter] = y;
 
-    for (int i = 0; i < *counter; i++)
-        cout << visitedCities[i] << endl;
+    //for (int i = 0; i < *counter; i++)
+    //    cout << visitedCities[i] << endl;
 }
 
 bool isVisited(int city, int* visitedCities, int* numberOfElements)
@@ -224,11 +247,12 @@ int* getOptimalList(int max_weight, int numberOfElements, List** list, int* opti
                     (good->getGoodValue() - shortWays[currentLocation][good->getDirectionX()]) / good->getGoodWeight()
                 );
             }
-            cout << good->getGoodCoeff() << endl; //наверно оставим чтоб показать как вычисляет коеффиценты
+            //cout << good->getGoodCoeff() << endl;
         }
 
         //sorted list in ascending order
-        list = quickSort(list, 0, lastIndex);//TODO makeGoodPivot function
+        choseBestPivot(list, numberOfElements); // puts best pivot into beginning
+        list = quickSort(list, 0, lastIndex);
 
         //since the list is sorted in ascending order the last element would be best
         //take last element add to optimalList and delete in list of all goods
@@ -249,6 +273,8 @@ int* getOptimalList(int max_weight, int numberOfElements, List** list, int* opti
 
             shift(list, lastIndex, index); //deals with empty space that left after delition
             //simply moves object that after "hole" by index - 1
+
+            cout << "Add to Optimal List good #" << optimalList[optimalCounter] + 1 << endl;
 
             optimalCounter++;
         }
