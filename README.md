@@ -22,4 +22,6 @@ destination: 1
 weight: 3
 value: 600
 destination: 5
+
+Answer: item#1 item#4 item#3
 ```
