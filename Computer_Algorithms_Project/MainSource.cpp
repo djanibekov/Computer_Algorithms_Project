@@ -36,6 +36,8 @@ int main()
 
     calculateShortWays();//predefined graph
 
+    display();
+
     cout << "Number of Goods: ";
     cin >> numberOfElements;
 
@@ -105,7 +107,7 @@ void display() //Debug purpose functoin
     {
         for (int j = 0; j < 10; j++)
         {
-            cout << cities[i][j] << " ";
+            cout << cities[i][j] << "| ";
         }
         cout << endl;
     }
@@ -116,7 +118,7 @@ void display() //Debug purpose functoin
     {
         for (int j = 0; j < 10; j++)
         {
-            cout << shortWays[i][j] << " ";
+            cout << shortWays[i][j] << "| ";
         }
         cout << endl;
     }
@@ -127,7 +129,7 @@ void display() //Debug purpose functoin
     {
         for (int j = 0; j < 10; j++)
         {
-            cout << P[i][j] << " ";
+            cout << P[i][j] << "| ";
         }
         cout << endl;
     }
