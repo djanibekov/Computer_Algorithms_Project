@@ -45,8 +45,8 @@
 
 
 ## Coefficient calculation
-| |ID|Weight|Value|Destination|Coeff1|Coeff2|Coeff3|
-|--- | --- | --- | --- |--- |--- |--- |--- |
+| |Weight|Value|Destination|Coeff1|Coeff2|Coeff3|
+|--- | --- | --- | --- |--- |--- |--- |
 |Item 1|5|15000|I|2870|-|-|
 |Item 2|3|100|E|-83.3|33.3|33.3|
 |Item 3|3|1000|C|250|143|143|
