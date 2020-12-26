@@ -43,6 +43,16 @@
 |J|6| 5| 5| 6| 7| 0| 0| 5| 5| 0|
 
 
+
+## Coefficient calculation
+| |ID|Weight|Value|Destination|Coeff1|Coeff2|Coeff3|
+|--- | --- | --- | --- |--- |--- |--- |--- |
+|Item 1|5|15000|I|2870|-|-|
+|Item 2|3|100|E|-83.3|33.3|33.3|
+|Item 3|3|1000|C|250|143|143|
+|Item 4|3|900|B|250|300|-|
+|Item 5|3|600|F|-16.6|103|103
+
 ```bash
 number of element: 5
 knapsack size: 12
@@ -52,11 +62,11 @@ value: 15000
 destination: 8
 
 weight: 3
-value: 1
+value: 100
 destination: 4
 
 weight: 3
-value: inf
+value: 1000
 destination: 2
 
 weight: 3
