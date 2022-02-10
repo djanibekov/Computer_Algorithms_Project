@@ -1,4 +1,15 @@
 # Computer_Algorithms_Project
+### Salesman with Knapsack problem implementation
+
+Combination of two common algorithm problems and its solution using devised algorithm and graph theory. Where and what are
+needed to deliver in order to maximize the profit
+
+## Advantages: 
+Optimal path with best sack weight finding .
+
+## Applied technology: 
+C++
+
 
 ## Map - Graph
 |City|A|B|C|D|E|F|G|H|I|J|
